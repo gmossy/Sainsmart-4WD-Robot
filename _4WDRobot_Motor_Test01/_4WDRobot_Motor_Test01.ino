@@ -1,11 +1,11 @@
 /* 
+4WDRobot_Motor_Test
 Sketch to test out the operation of the Sainsmart 4WD Robot.
 4WD Robot by Glenn Mossy
 gmossy@gmail.com
 
 DC Robotics Group, Arduino Motors Workshop, Dec 6, 2014
-Nov 30, 2014, version 1.2
-      
+Dec 1, 2014, version 1.0      
       
        *THE SUBROUTINES WORK AS FOLLOWS*
 
@@ -29,7 +29,7 @@ motorA(1, 33);
 
 #include <Servo.h>    //servo library
 #include "pitches.h"  // used for the speaker output
-#define SPEAKER 10    // Speaker Pin
+#define SPEAKER 10    // define a Speaker Pin
 
 Servo headservo;      // initialize a servo object
 
@@ -38,10 +38,10 @@ Servo headservo;      // initialize a servo object
 #define ENA 5  //enable A on pin 5 (must be a pwm pin)   Speed Control
 #define ENB 3  //enable B on pin 3 (must be a pwm pin)   Speed Control
 
-#define IN1 7  //IN1 on pin  controls one side of bridge A
-#define IN2 6  //IN2 on pin controls other side of A
-#define IN3 4  //IN3 on pin conrtols one side of bridge B 
-#define IN4 2  //IN4 on pin  controls other side of B
+#define IN1 7  //IN1 on pin controls Motor A  Motor A is the left side Motor
+#define IN2 6  //IN2 on pin controls Motor A
+#define IN3 4  //IN3 on pin conrtols Motor B  Motor B is the Right side Motor
+#define IN4 2  //IN4 on pin controls Motor B 
 
 const int EchoPin = 11; // HC-SR04 Ultrasonic signal input
 const int TrigPin = 12; // HC-SR04 Ultrasonic signal output
@@ -51,7 +51,7 @@ const int rightmotorpin2 = IN2;  //signal output 2 of Dc motor
 const int leftmotorpin1  = IN3;  //signal output 3 of Dc motor 
 const int leftmotorpin2  = IN4;  //signal output 4 of Dc motor 
 
-int motorSpeed = 20;             //set an initial motor speed
+int motorSpeed;          //define motor speed parameter which will be mapped as a percentage value
 
 const int HeadServopin = 9; // signal input of headservo
 
@@ -66,7 +66,9 @@ boolean running = false;//
 
 void setup() { 
 Serial.begin(9600); // Enables Serial monitor for debugging purposes
-Serial.println("Ready to receive Serial Commands!"); // Tell us I"m ready
+Serial.println("Ready to receive Serial Commands![f, b, r, l, s]"); // Tell us I"m ready
+
+  motorSpeed= 30;            //set an initial motor speed as a percentage value
 
 //signal output port
   //set all of the outputs
@@ -76,6 +78,7 @@ Serial.println("Ready to receive Serial Commands!"); // Tell us I"m ready
   pinMode(IN4, OUTPUT);       // Motor Driver
   int motorSpeed = 15;        // Set motorSpeed variable with an initial motor speed % (percentage)
   
+  intialize_beeps();
 /*
 // HC-SR04 interface
    pinMode(TrigPin, OUTPUT);  // Set the HC-SR04 pin
@@ -99,6 +102,7 @@ void loop()
     if (Serial.available() > 0)
     {
     int val = Serial.read();	//read serial input commands
+     buzz();
     switch(val)
     {
     case 'f' : 
@@ -138,7 +142,8 @@ void loop()
       delay(5000);
             break;
     }      
-    delay(20);  
+    delay(1);  
+    Serial.println("Ready to receive Serial Commands![f, b, r, l, s]"); // Tell us I"m ready
   }
              
   if(roam == 0){ //just listen for serial commands and wait
@@ -154,34 +159,33 @@ void moveForward(int motorSpeed)
    // int motorSpeed);  // change the 15 to the Speed variable, and put Speed int the function call command arguments.
     //also add delayTime for example like this:   moveForward(int delayTime, int motorSpeed)
     
-    motorA(1, motorSpeed);  //have motor A turn clockwise at % speed
-    motorB(1, motorSpeed);  //have motor A turn clockwise at % speed
+    motorA(1, motorSpeed);  //have motor A turn clockwise at % speed, , call motor control method
+    motorB(1, motorSpeed);  //have motor B turn clockwise at % speed
     Serial.println("Forward");
-}
-void body_lturn(int motorSpeed)
-{
-   motorA(1, motorSpeed);  //have motor B turn clockwise
-   motorB(2, motorSpeed);  //have motor B turn counterclockwise 
-    Serial.println("Left");
 }
 void body_rturn(int motorSpeed)
 {
-   motorA(2, motorSpeed/2);  //have motor B turn counterclockwise 
-   motorB(1, motorSpeed/2);  //have motor B turn clockwise 
+   motorA(1, motorSpeed);  //have motor A turn counterclockwise 
+   motorB(2, motorSpeed);  //have motor B turn clockwise 
    Serial.println("Right");
+}
+   void body_lturn(int motorSpeed)
+{
+   motorA(2, motorSpeed);  //have motor A turn clockwise
+   motorB(1, motorSpeed);  //have motor B turn counterclockwise 
+   Serial.println("Left");
 }
 void moveBackward(int motorSpeed)
 {
-    int Speed;
-    motorA(2, motorSpeed/2);  //have motor A turn counterclockwise 
-    motorB(2, motorSpeed/2);  //have motor A turn counterclockwise
+    motorA(2, motorSpeed);  //have motor A turn counterclockwise 
+    motorB(2, motorSpeed);  //have motor B turn counterclockwise
     Serial.println("Backward");
 }
 
 void brake()
 {
-    motorA(3, 100);  //brake motor A with 100% braking power
-    motorB(3, 100);  //brake motor A with 100% braking power
+    motorA(3, 100);  //brake motor A with 100% braking power, call motor control method
+    motorB(3, 100);  //brake motor B with 100% braking power, call motor control method
     Serial.println("Brake");
 }
 
@@ -250,7 +254,6 @@ void motorA(int mode, int percent)
 //******************   Motor B control   *******************
   void motorB(int mode, int percent)
 {
-  
   //change the percentage range of 0 -> 100 into the PWM
   //range of 0 -> 255 using the map function
   int duty = map(percent, 0, 100, 0, 255);
@@ -343,6 +346,7 @@ void buzz(){
 tone(SPEAKER, NOTE_C7, 100);
 delay(50);
 tone(SPEAKER, NOTE_C6, 100);
+delay(50);
 }
 void intialize_beeps()
 {
@@ -356,5 +360,6 @@ void intialize_beeps()
   tone(SPEAKER, NOTE_C7, 100);
   delay(500);
   tone(SPEAKER, NOTE_C6, 100);
+  delay(500);
   //End Initialize Beeps
 }
