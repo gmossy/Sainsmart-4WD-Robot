@@ -1,42 +1,39 @@
 /* 
-Sketch for  to test out the operation of the Robot.
+Sketch to test out the operation of the Sainsmart 4WD Robot.
 4WD Robot by Glenn Mossy
-DC Robotics Group, Arduino Motors Workshop 
-Nov 29, 2014, version 1.1
+gmossy@gmail.com
+
+DC Robotics Group, Arduino Motors Workshop, Dec 6, 2014
+Nov 30, 2014, version 1.2
       
       
        *THE SUBROUTINES WORK AS FOLLOWS*
 
-motorA(mode, speed)
-% replace A with B to control motor B %
+motorA(mode, speed)  // % replace A with B to control motor B %
 
-mode is a number 0 -> 3 that determines what the motor 
-will do.
+mode is a number 0 -> 3 that determines what the motor will do.
 0 = coast/disable the H bridge
 1 = turn motor clockwise
 2 = turn motor counter clockwise
 3 = brake motor
 
-speed is a number 0 -> 100 that represents percentage of
-motor speed.
+speed is a number 0 -> 100 that represents percentage of motor speed.
 0 = off
 50 = 50% of full motor speed
 100 = 100% of full motor speed
 
 EXAMPLE
-Say you need to have motor A turn clockwise at 33% of its
-full speed.  The subroutine call would be the following...
-
+Say you need to have motor A turn clockwise at 33% of its full speed.  The subroutine call would be the following...
 motorA(1, 33);
 */
 
-#include <Servo.h> //servo library
-#include "pitches.h"// used for the speaker output
-#define SPEAKER 10// Speaker Pin
+#include <Servo.h>    //servo library
+#include "pitches.h"  // used for the speaker output
+#define SPEAKER 10    // Speaker Pin
 
-Servo headservo;
+Servo headservo;      // initialize a servo object
 
-//Hardware set pins
+//Hardware set the pins
 // L298D Motor Controller
 #define ENA 5  //enable A on pin 5 (must be a pwm pin)   Speed Control
 #define ENB 3  //enable B on pin 3 (must be a pwm pin)   Speed Control
@@ -49,41 +46,27 @@ Servo headservo;
 const int EchoPin = 11; // HC-SR04 Ultrasonic signal input
 const int TrigPin = 12; // HC-SR04 Ultrasonic signal output
 
-const int rightmotorpin1 = IN1;
-const int rightmotorpin2 = IN2;
-const int leftmotorpin1  = IN3; //signal output of Dc motor driven plate
-const int leftmotorpin2  = IN4;
+const int rightmotorpin1 = IN1;  //signal output 1 of Dc motor 
+const int rightmotorpin2 = IN2;  //signal output 2 of Dc motor 
+const int leftmotorpin1  = IN3;  //signal output 3 of Dc motor 
+const int leftmotorpin2  = IN4;  //signal output 4 of Dc motor 
 
-int motorSpeed = 0;
+int motorSpeed = 20;             //set an initial motor speed
 
 const int HeadServopin = 9; // signal input of headservo
+
 //const int maxStart = 800; //run dec time
-unsigned long time; // (time used instead of loops)
-unsigned long time1; // (time used instead of loops)
-int add= 0; //used for nodanger loop count
-int add1= 0;  //used for nodanger loop count
+unsigned long time;         // (time used instead of loops)
+unsigned long time1;        // (time used instead of loops)
+int add= 0;                 //used for nodanger loop count
+int add1= 0;                //used for nodanger loop count
 int roam = 1;
 int currDist = 5000; // distance
 boolean running = false;// 
 
-void setup() {
-  /*
-  //initialize beeps
-  tone(SPEAKER, NOTE_C7, 100);
-  delay(500);
-  tone(SPEAKER, NOTE_C6, 100);
-  tone(SPEAKER, NOTE_C7, 100);
-  delay(500);
-  tone(SPEAKER, NOTE_C6, 100);
-  tone(SPEAKER, NOTE_C7, 100);
-  delay(500);
-  tone(SPEAKER, NOTE_C6, 100);
-  //End Initialize Beeps
-  */
-  
+void setup() { 
 Serial.begin(9600); // Enables Serial monitor for debugging purposes
-Serial.println("Ready to receive Serial val Commands!"); // Tell us I"m ready
-//pinMode(EchoPin, INPUT);//signal input port
+Serial.println("Ready to receive Serial Commands!"); // Tell us I"m ready
 
 //signal output port
   //set all of the outputs
@@ -91,7 +74,7 @@ Serial.println("Ready to receive Serial val Commands!"); // Tell us I"m ready
   pinMode(IN2, OUTPUT);       // Motor Driver
   pinMode(IN3, OUTPUT);       // Motor Driver
   pinMode(IN4, OUTPUT);       // Motor Driver
-  int motorSpeed = 15;        // Set initial motor speed
+  int motorSpeed = 15;        // Set motorSpeed variable with an initial motor speed % (percentage)
   
 /*
 // HC-SR04 interface
@@ -99,7 +82,7 @@ Serial.println("Ready to receive Serial val Commands!"); // Tell us I"m ready
    pinMode(EchoPin, INPUT);  // Set the HC-SR04 pin
    
 headservo.attach(HeadServopin);
-//start movable head
+//start movable servo head
 headservo.write(160);
 delay(1000);
 headservo.write(20);
@@ -126,8 +109,7 @@ void loop()
       delay(5000);
       break;
       
-    case 'l' :
-    
+    case 'l' : 
       Serial.println("Turning Left!");
       body_lturn(motorSpeed);
       delay(5000);
@@ -135,20 +117,23 @@ void loop()
       delay(5000);
       break;
       
-    case 'r' : 
-      
+    case 'r' :   
       Serial.println("Turning Right!");
       body_rturn(motorSpeed);
       delay(5000);
       brake();
       delay(5000);
-            break;
-          
+            break;       
    case 'b' :
           
       Serial.println("Turning Backward!");
       moveBackward(motorSpeed);
       delay(5000);
+      brake();
+      delay(5000);
+            break;
+   case 's' :      
+      Serial.println("Stop!");
       brake();
       delay(5000);
             break;
@@ -169,42 +154,44 @@ void moveForward(int motorSpeed)
    // int motorSpeed);  // change the 15 to the Speed variable, and put Speed int the function call command arguments.
     //also add delayTime for example like this:   moveForward(int delayTime, int motorSpeed)
     
-    motorA(1, motorSpeed);  //have motor A turn clockwise at 15% speed
-    motorB(1, motorSpeed);  //have motor A turn clockwise at 15% speed
-    delay(10);
+    motorA(1, motorSpeed);  //have motor A turn clockwise at % speed
+    motorB(1, motorSpeed);  //have motor A turn clockwise at % speed
+    Serial.println("Forward");
 }
 void body_lturn(int motorSpeed)
 {
-   motorA(1, motorSpeed);  //have motor B turn clockwise at 15% speed
-   motorB(2, motorSpeed);  //have motor B turn counterclockwise at 15% speed
-       delay(10);
+   motorA(1, motorSpeed);  //have motor B turn clockwise
+   motorB(2, motorSpeed);  //have motor B turn counterclockwise 
+    Serial.println("Left");
 }
 void body_rturn(int motorSpeed)
 {
-   motorA(2, motorSpeed);  //have motor B turn counterclockwise at 15% speed
-   motorB(1, motorSpeed);  //have motor B turn clockwise at 15% speed
-   delay(10);
+   motorA(2, motorSpeed/2);  //have motor B turn counterclockwise 
+   motorB(1, motorSpeed/2);  //have motor B turn clockwise 
+   Serial.println("Right");
 }
 void moveBackward(int motorSpeed)
 {
     int Speed;
-    motorA(2, motorSpeed);  //have motor A turn counterclockwise at 15% speed
-    motorB(2, motorSpeed);  //have motor A turn counterclockwisee at 15% speed
-    delay(10);
+    motorA(2, motorSpeed/2);  //have motor A turn counterclockwise 
+    motorB(2, motorSpeed/2);  //have motor A turn counterclockwise
+    Serial.println("Backward");
 }
 
 void brake()
 {
     motorA(3, 100);  //brake motor A with 100% braking power
     motorB(3, 100);  //brake motor A with 100% braking power
-    delay(1);
+    Serial.println("Brake");
 }
 
 
 //******************   Motor A control   *******************
 void motorA(int mode, int percent)
 {
-  
+ // Method that will accept mode and speed in percentage.  
+ // mode: The 3 modes are 0) coast  1) Clockwise motor  2) Counter-clockwise 3) brake
+ // percent: The speed of the motor in percentage value for the PWM.
   //change the percentage range of 0 -> 100 into the PWM
   //range of 0 -> 255 using the map function
   int duty = map(percent, 0, 100, 0, 255);
@@ -213,6 +200,7 @@ void motorA(int mode, int percent)
   {
     case 0:  //disable/coast
       digitalWrite(ENA, LOW);  //set enable low to disable A
+      Serial.println("Disable/coast A");
       break;
       
     case 1:  //turn clockwise
@@ -224,6 +212,7 @@ void motorA(int mode, int percent)
       
       //use pwm to control motor speed through enable pin
       analogWrite(ENA, duty);  
+      Serial.println("turn motor A clockwise");
       
       break;
       
@@ -236,6 +225,7 @@ void motorA(int mode, int percent)
       
       //use pwm to control motor speed through enable pin
       analogWrite(ENA, duty);  
+      Serial.println("turn motor A counter-clockwise");
       
       break;
       
@@ -249,6 +239,7 @@ void motorA(int mode, int percent)
       //use pwm to control motor braking power 
       //through enable pin
       analogWrite(ENA, duty);  
+      Serial.println("brake motor A");
       
       break;
   }
@@ -268,6 +259,7 @@ void motorA(int mode, int percent)
   {
     case 0:  //disable/coast
       digitalWrite(ENB, LOW);  //set enable low to disable B
+      Serial.println("Disable/coast B");
       break;
       
     case 1:  //turn clockwise
@@ -278,7 +270,8 @@ void motorA(int mode, int percent)
       digitalWrite(IN4, LOW);  
       
       //use pwm to control motor speed through enable pin
-      analogWrite(ENB, duty);  
+      analogWrite(ENB, duty); 
+           Serial.println("turn motor B clockwise"); 
       
       break;
       
@@ -291,6 +284,7 @@ void motorA(int mode, int percent)
       
       //use pwm to control motor speed through enable pin
       analogWrite(ENB, duty);  
+       Serial.println("turn motor B counter-clockwise");
       
       break;
       
@@ -304,13 +298,14 @@ void motorA(int mode, int percent)
       //use pwm to control motor braking power 
       //through enable pin
       analogWrite(ENB, duty);  
-      
+      Serial.println("brake motor B");      
       break;
   }
 }
 //**********************************************************
 
 void toggleRoam(){
+  // This method chooses to make the robot roam or else use the serial command input.
 if(roam == 0){
    roam = 1;
    Serial.println("Activated Roam Mode");
@@ -321,15 +316,11 @@ if(roam == 0){
     Serial.println("De-activated Roam Mode");
   }
 }
-void buzz(){
-tone(SPEAKER, NOTE_C7, 100);
-delay(50);
-tone(SPEAKER, NOTE_C6, 100);
-}
 
 
 //measure distance, unit “cm”
 long MeasuringDistance() {
+  // This method reads the HC-SR04 Ultrasonic Sensor and returns the distance measured of an object in front the sensor
       // Calculates the Distance in cm
     float cm;                          //define variables for distance sensor 
     // ((time)*(Speed of sound))/ toward and backward of object) = Width of Echo pulse, in uS (micro second)
@@ -347,3 +338,23 @@ duration = pulseIn(EchoPin, HIGH);
 return duration / 29 / 2 + adjust;        // Actual calculation in centimeters
 }
 
+void buzz(){
+ // method to create a buzz sound
+tone(SPEAKER, NOTE_C7, 100);
+delay(50);
+tone(SPEAKER, NOTE_C6, 100);
+}
+void intialize_beeps()
+{
+   //initializing the robot beeps sound
+  tone(SPEAKER, NOTE_C7, 100);
+  delay(500);
+  tone(SPEAKER, NOTE_C6, 100);
+  tone(SPEAKER, NOTE_C7, 100);
+  delay(500);
+  tone(SPEAKER, NOTE_C6, 100);
+  tone(SPEAKER, NOTE_C7, 100);
+  delay(500);
+  tone(SPEAKER, NOTE_C6, 100);
+  //End Initialize Beeps
+}
