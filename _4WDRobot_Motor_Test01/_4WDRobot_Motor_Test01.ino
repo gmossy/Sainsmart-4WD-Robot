@@ -2,6 +2,7 @@
 4WDRobot_Motor_Test
 Sketch to test out the operation of the Sainsmart 4WD Robot.
 4WD Robot by Glenn Mossy
+https://github.com/gmossy/Sainsmart-4WD-Robot
 gmossy@gmail.com
 
 DC Robotics Group, Arduino Motors Workshop, Dec 6, 2014
@@ -43,9 +44,6 @@ Servo headservo;      // initialize a servo object
 #define IN3 4  //IN3 on pin conrtols Motor B  Motor B is the Right side Motor
 #define IN4 2  //IN4 on pin controls Motor B 
 
-const int EchoPin = 11; // HC-SR04 Ultrasonic signal input
-const int TrigPin = 12; // HC-SR04 Ultrasonic signal output
-
 const int rightmotorpin1 = IN1;  //signal output 1 of Dc motor 
 const int rightmotorpin2 = IN2;  //signal output 2 of Dc motor 
 const int leftmotorpin1  = IN3;  //signal output 3 of Dc motor 
@@ -53,16 +51,22 @@ const int leftmotorpin2  = IN4;  //signal output 4 of Dc motor
 
 int motorSpeed;          //define motor speed parameter which will be mapped as a percentage value
 
-const int HeadServopin = 9; // signal input of headservo
+// pins for the HC-SR04 Ultrasonic Distance Sensor
+const int EchoPin = 11; // HC-SR04 Ultrasonic signal input
+const int TrigPin = 12; // HC-SR04 Ultrasonic signal output
+const int HeadServopin = 9; // pin for signal input of headservo
 
+/*
 //const int maxStart = 800; //run dec time
 unsigned long time;         // (time used instead of loops)
 unsigned long time1;        // (time used instead of loops)
-int add= 0;                 //used for nodanger loop count
-int add1= 0;                //used for nodanger loop count
-int roam = 1;
+int add= 0;                 // used for nodanger loop count in roam mode
+int add1= 0;                // used for nodanger loop count in roam mode
 int currDist = 5000; // distance
 boolean running = false;// 
+*/
+  int roam = 0;             //just listen for serial commands and wait
+
 
 void setup() { 
 Serial.begin(9600); // Enables Serial monitor for debugging purposes
@@ -70,22 +74,23 @@ Serial.println("Ready to receive Serial Commands![f, b, r, l, s]"); // Tell us I
 
   motorSpeed= 30;            //set an initial motor speed as a percentage value
 
-//signal output port
-  //set all of the outputs
+ //signal output port
+ //set all of the outputs for the motor driver
   pinMode(IN1, OUTPUT);       // Motor Driver
   pinMode(IN2, OUTPUT);       // Motor Driver
   pinMode(IN3, OUTPUT);       // Motor Driver
   pinMode(IN4, OUTPUT);       // Motor Driver
   int motorSpeed = 15;        // Set motorSpeed variable with an initial motor speed % (percentage)
   
-  intialize_beeps();
-/*
+  intialize_beeps();          // call the intialize_beeps method and play some tones 
+
+/* uncomment the HC-SR04 code when you are ready to use it.
 // HC-SR04 interface
-   pinMode(TrigPin, OUTPUT);  // Set the HC-SR04 pin
-   pinMode(EchoPin, INPUT);  // Set the HC-SR04 pin
+   pinMode(TrigPin, OUTPUT);  // Set the HC-SR04 Trig as Output
+   pinMode(EchoPin, INPUT);   // Set the HC-SR04 Echo as Input
    
 headservo.attach(HeadServopin);
-//start movable servo head
+//start my movable servo head, to verify I work.
 headservo.write(160);
 delay(1000);
 headservo.write(20);
@@ -151,7 +156,6 @@ void loop()
       }
       else if(roam == 1){  //If roam active- drive autonomously
       }
-  
   }
   
 void moveForward(int motorSpeed)
