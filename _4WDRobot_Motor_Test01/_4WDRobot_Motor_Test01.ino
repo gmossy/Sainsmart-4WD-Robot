@@ -72,7 +72,7 @@ void setup() {
 Serial.begin(9600); // Enables Serial monitor for debugging purposes
 Serial.println("Ready to receive Serial Commands![f, b, r, l, s]"); // Tell us I"m ready
 
-  motorSpeed= 30;            //set an initial motor speed as a percentage value
+  motorSpeed= 55;            //set an initial motor speed as a percentage value
 
  //signal output port
  //set all of the outputs for the motor driver
@@ -84,21 +84,20 @@ Serial.println("Ready to receive Serial Commands![f, b, r, l, s]"); // Tell us I
   
   intialize_beeps();          // call the intialize_beeps method and play some tones 
 
-/* uncomment the HC-SR04 code when you are ready to use it.
+// uncomment the HC-SR04 code when you are ready to use it.
 // HC-SR04 interface
    pinMode(TrigPin, OUTPUT);  // Set the HC-SR04 Trig as Output
    pinMode(EchoPin, INPUT);   // Set the HC-SR04 Echo as Input
    
 headservo.attach(HeadServopin);
 //start my movable servo head, to verify I work.
-headservo.write(160);
+headservo.write(180);
 delay(1000);
 headservo.write(20);
 delay(1000);
 headservo.write(90);
 delay(1000);
-return;
-*/
+//return;
 
 }
 void loop() 
