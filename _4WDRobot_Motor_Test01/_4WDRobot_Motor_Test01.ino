@@ -67,12 +67,16 @@ boolean running = false;//
 */
   int roam = 0;             //just listen for serial commands and wait
 
-
 void setup() { 
 Serial.begin(9600); // Enables Serial monitor for debugging purposes
-Serial.println("Ready to receive Serial Commands![f, b, r, l, s]"); // Tell us I"m ready
-
-  motorSpeed= 55;            //set an initial motor speed as a percentage value
+Serial.println("Ready to receive Serial Commands![f, b, r, l, s, t]"); // Tell us I"m ready
+Serial.println("My Commands are: ");
+Serial.println("f:forward");
+Serial.println("b:backward");
+Serial.println("r:right");
+Serial.println("l:left");
+Serial.println("s:stop");
+Serial.println("t:toggleRoam");
 
  //signal output port
  //set all of the outputs for the motor driver
@@ -80,7 +84,8 @@ Serial.println("Ready to receive Serial Commands![f, b, r, l, s]"); // Tell us I
   pinMode(IN2, OUTPUT);       // Motor Driver
   pinMode(IN3, OUTPUT);       // Motor Driver
   pinMode(IN4, OUTPUT);       // Motor Driver
-  int motorSpeed = 15;        // Set motorSpeed variable with an initial motor speed % (percentage)
+  
+  motorSpeed = 55;        // Set motorSpeed variable with an initial motor speed % (percentage)
   
   intialize_beeps();          // call the intialize_beeps method and play some tones 
 
@@ -97,11 +102,9 @@ headservo.write(20);
 delay(1000);
 headservo.write(90);
 delay(1000);
-//return;
 
 }
 void loop() 
-
   {
     if (Serial.available() > 0)
     {
@@ -120,7 +123,7 @@ void loop()
     case 'l' : 
       Serial.println("Turning Left!");
       body_lturn(motorSpeed);
-      delay(5000);
+      delay(2000);
       brake();
       delay(5000);
       break;
@@ -128,12 +131,11 @@ void loop()
     case 'r' :   
       Serial.println("Turning Right!");
       body_rturn(motorSpeed);
-      delay(5000);
+      delay(2000);
       brake();
       delay(5000);
             break;       
-   case 'b' :
-          
+   case 'b' :    
       Serial.println("Turning Backward!");
       moveBackward(motorSpeed);
       delay(5000);
@@ -145,15 +147,20 @@ void loop()
       brake();
       delay(5000);
             break;
+   case 't' :      
+      Serial.println("toggle Roam Mode"); 
+      toggleRoam();
+      break;
     }      
     delay(1);  
-    Serial.println("Ready to receive Serial Commands![f, b, r, l, s]"); // Tell us I"m ready
+    Serial.println("I'm Ready to receive Serial Commands![f, b, r, l, s, t]"); // Tell us I"m ready
   }
              
-  if(roam == 0){ //just listen for serial commands and wait
-      // Do something else if you like
+  if(roam == 0){ 
+      //just listen for serial commands and wait
       }
-      else if(roam == 1){  //If roam active- drive autonomously
+  else if(roam == 1){  //If roam active- drive autonomously
+    goRoam();
       }
   }
   
@@ -162,9 +169,15 @@ void moveForward(int motorSpeed)
    // int motorSpeed);  // change the 15 to the Speed variable, and put Speed int the function call command arguments.
     //also add delayTime for example like this:   moveForward(int delayTime, int motorSpeed)
     
-    motorA(1, motorSpeed);  //have motor A turn clockwise at % speed, , call motor control method
-    motorB(1, motorSpeed);  //have motor B turn clockwise at % speed
+    motorA(2, motorSpeed);  //have motor A turn clockwise at % speed, , call motor control method
+    motorB(2, motorSpeed);  //have motor B turn clockwise at % speed
     Serial.println("Forward");
+}
+void moveBackward(int motorSpeed)
+{
+    motorA(1, motorSpeed);  //have motor A turn counterclockwise 
+    motorB(1, motorSpeed);  //have motor B turn counterclockwise
+    Serial.println("Backward");
 }
 void body_rturn(int motorSpeed)
 {
@@ -177,12 +190,6 @@ void body_rturn(int motorSpeed)
    motorA(2, motorSpeed);  //have motor A turn clockwise
    motorB(1, motorSpeed);  //have motor B turn counterclockwise 
    Serial.println("Left");
-}
-void moveBackward(int motorSpeed)
-{
-    motorA(2, motorSpeed);  //have motor A turn counterclockwise 
-    motorB(2, motorSpeed);  //have motor B turn counterclockwise
-    Serial.println("Backward");
 }
 
 void brake()
@@ -322,8 +329,13 @@ if(roam == 0){
     Serial.println("De-activated Roam Mode");
   }
 }
-
-
+void goRoam(){
+ // insert roaming function control here. 
+   Serial.println("Im going roaming");
+    moveForward(motorSpeed);    // temporary just go forward for a little while
+   delay(20000);
+} 
+      
 //measure distance, unit “cm”
 long MeasuringDistance() {
   // This method reads the HC-SR04 Ultrasonic Sensor and returns the distance measured of an object in front the sensor
