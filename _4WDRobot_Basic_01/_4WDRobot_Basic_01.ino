@@ -1,5 +1,5 @@
 /* 
-4WDRobot_Motor_Test
+4WDRobot_Motor_Basic with Roaming for Danger
 Sketch to test out the operation of the Sainsmart 4WD Robot.
 4WD Robot by Glenn Mossy
 https://github.com/gmossy/Sainsmart-4WD-Robot
@@ -57,13 +57,12 @@ const int TrigPin = 12; // HC-SR04 Ultrasonic signal output
 const int HeadServopin = 9; // pin for signal input of headservo
 
 
-int add= 0; //used for nodanger loop count
-int add1= 0;  //used for nodanger loop count
-int roam = 0;    //just listen for serial commands and wait
+int add= 0;       //used for nodanger loop count
+int add1= 0;      //used for nodanger loop count
+int roam = 0;     //just listen for serial commands and wait
 int currDist = 5000; // distance
-boolean running = false;// This is from old code examples
+boolean running = false;// boolean to flag whether i'm running or not
 
-     
 
 void setup() { 
 Serial.begin(9600); // Enables Serial monitor for debugging purposes
@@ -158,27 +157,11 @@ void loop()
       //just listen for serial commands and wait
       }
   else if(roam == 1){  //If roam active- drive autonomously
-//time = millis(); // Sets "time" to current system time count
-currDist = MeasuringDistance(); //measure front distance
-Serial.print("Current Forward Distance: ");
-//Serial.println(currDist);
-if(currDist > 35) {
-  add = (add1++);// Start adding up the loop count done in nodanger
-nodanger();
-Serial.println("Nodanger: ");
-}
-else if(currDist < 35){
-  //add=0;
-  Serial.println("Forward Blocked- Decide Which Way");
-  moveBackward(40);
-  whichway();
+      goRoam();          // Go Roaming.  
+      }
+ }
   
-}
-  }
-  
-  }
-
-
+//******************   moveForward *******************
 void moveForward(int motorSpeed)
 {
    // int motorSpeed);  // change the 15 to the Speed variable, and put Speed int the function call command arguments.
@@ -275,7 +258,6 @@ void motorA(int mode, int percent)
 }
 //**********************************************************
 
-
 //******************   Motor B control   *******************
   void motorB(int mode, int percent)
 {
@@ -348,10 +330,27 @@ void goRoam(){
  // insert roaming function control here. 
    Serial.println("Im going roaming");
     moveForward(motorSpeed);    // temporary just go forward for a little while
-   delay(10000);
-     brake();
+    delay(500);
+    brake();
      
-} 
+//time = millis(); // Sets "time" to current system time count
+currDist = MeasuringDistance(); //measure front distance
+Serial.print("Current Forward Distance: ");
+Serial.println(currDist);                       // Print the current distance
+if(currDist > 35) {
+  add = (add1++);// Start adding up the loop count done in nodanger
+nodanger();
+Serial.println("Nodanger: ");
+}
+else if(currDist < 35){
+  //add=0;
+  Serial.println("Forward Blocked- Decide Which Way");
+  moveBackward(30);            // Move backward with % speed
+  whichway();                  // decide which way to go
+  
+   }
+  }
+ 
       
 //measure distance, unit “cm”
 long MeasuringDistance() {
@@ -395,17 +394,14 @@ void intialize_beeps()
   delay(500);
   //End Initialize Beeps
 }
-
+//******************    nodanger   *******************
 void nodanger() {
-running = true;// Do I need these?
-analogWrite(leftmotorpin1, 0);//Changed these to analog write for slower
-analogWrite(leftmotorpin2, 120);
-analogWrite(rightmotorpin1, 0);
-analogWrite(rightmotorpin2, 120);
-if (add1 > 38 ) whichway(); // Robot will stop and check direction every X loops through nodanger then resets in totalhalt (40 is good)
-return;
+   running = true;//  Yes I'm still running
+   if (add1 > 38 ) whichway(); // Robot will stop and check direction every X loops through nodanger then resets in totalhalt (40 is good)
+   return;
 }
-//choose which way to turn
+//******************    whichway   *******************
+//choose which way to turn when an object is blocking my path in front of my HC-SR04 distance sensor
 void whichway() {
 running = true;//Do I need these?
       brake();
@@ -414,30 +410,32 @@ running = true;//Do I need these?
 headservo.write(160);
 delay(900);
 int lDist = MeasuringDistance(); // check left distance
-Serial.println("checking left");
+Serial.print("checking left: ");
 Serial.println(lDist);
 headservo.write(20); // turn the servo right
 delay(900);
 int rDist = MeasuringDistance(); // check right distance
-Serial.println("checking right");
+Serial.print("checking right: ");
 Serial.println(rDist);
-//totalhalt(); //  Do I need this???  Used to be used to centre the servo
+
 if(lDist < rDist) {
 Serial.println("Decided Right Is Best");
-buzz();//  buzz
-body_rturn();
-break();
+buzz();  //  buzz 
+body_rturn(motorSpeed);
 delay(2000);
-currDist = MeasuringDistance(); //measure front distance
-if(currDist < 45) body_rturn();  //if front distance still too small- turn again
+
+currDist = MeasuringDistance();  //measure front distance
+if(currDist < 45) body_rturn(motorSpeed);  //if front distance still too small- turn again
 }
 else{
 Serial.println("Decided Left Is Best");
-  buzz();// Make him talk
-  body_lturn();
-  totalhalt();
+  buzz();  // Make him talk
+  body_lturn(motorSpeed);
+   brake();       // Stop Me
+
   currDist = MeasuringDistance(); //measure front distance
-  if(currDist < 45) body_lturn();// if front distance still too small- turn again
+  if(currDist < 45) body_lturn(motorSpeed); // if front distance still too small- turn again
    }
 return;
 } 
+//**********************************************************
