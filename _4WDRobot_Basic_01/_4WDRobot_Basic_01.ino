@@ -393,8 +393,9 @@ void intialize_beeps()
   tone(SPEAKER, NOTE_C6, 100);
   delay(500);
   //End Initialize Beeps
-  */
+  
 }
+*/
 //******************    nodanger   *******************
 void nodanger() {
    running = true;//  Yes I'm still running
@@ -421,7 +422,7 @@ Serial.println(rDist);
 
 if(lDist < rDist) {
 Serial.println("Decided Right Is Best");
-buzz();  //  buzz 
+//buzz();  //  buzz 
 body_rturn(motorSpeed);
 delay(2000);
 
@@ -430,7 +431,7 @@ if(currDist < 45) body_rturn(motorSpeed);  //if front distance still too small- 
 }
 else{
 Serial.println("Decided Left Is Best");
-  buzz();  // Make him talk
+ // buzz();  // Make him talk
   body_lturn(motorSpeed);
    brake();       // Stop Me
 
