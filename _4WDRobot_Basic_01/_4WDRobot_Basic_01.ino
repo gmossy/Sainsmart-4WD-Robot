@@ -330,7 +330,7 @@ void goRoam(){
  // insert roaming function control here. 
    Serial.println("Im going roaming");
     moveForward(motorSpeed);    // temporary just go forward for a little while
-    delay(500);
+    delay(1000);
     brake();
      
 //time = millis(); // Sets "time" to current system time count
