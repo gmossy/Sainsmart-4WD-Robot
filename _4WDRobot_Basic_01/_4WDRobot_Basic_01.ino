@@ -29,7 +29,7 @@ motorA(1, 33);
 */
 
 #include <Servo.h>    //servo library
-#include "pitches.h"  // used for the speaker output
+//#include "pitches.h"  // used for the speaker output
 #define SPEAKER 10    // define a Speaker Pin
 
 Servo headservo;      // initialize a servo object
@@ -84,7 +84,7 @@ Serial.println("t:toggleRoam");
   
   motorSpeed = 55;        // Set motorSpeed variable with an initial motor speed % (percentage)
   
-  intialize_beeps();          // call the intialize_beeps method and play some tones 
+ // intialize_beeps();          // call the intialize_beeps method and play some tones 
 
 // uncomment the HC-SR04 code when you are ready to use it.
 // HC-SR04 interface
@@ -106,7 +106,7 @@ void loop()
     if (Serial.available() > 0)
     {
     int val = Serial.read();	//read serial input commands
-     buzz();
+ //    buzz();
     switch(val)
     {
     case 'f' : 
@@ -371,7 +371,7 @@ digitalWrite(TrigPin, LOW);
 duration = pulseIn(EchoPin, HIGH);
 return duration / 29 / 2 + adjust;        // Actual calculation in centimeters
 }
-
+/*
 void buzz(){
  // method to create a buzz sound
 tone(SPEAKER, NOTE_C7, 100);
@@ -393,6 +393,7 @@ void intialize_beeps()
   tone(SPEAKER, NOTE_C6, 100);
   delay(500);
   //End Initialize Beeps
+  */
 }
 //******************    nodanger   *******************
 void nodanger() {
@@ -438,4 +439,5 @@ Serial.println("Decided Left Is Best");
    }
 return;
 } 
+
 //**********************************************************
