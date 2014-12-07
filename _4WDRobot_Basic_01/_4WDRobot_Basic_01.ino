@@ -24,12 +24,12 @@ speed is a number 0 -> 100 that represents percentage of motor speed.
 100 = 100% of full motor speed
 
 EXAMPLE
-Say you need to have motor A turn clockwise at 33% of its full speed.  The subroutine call would be the following...
+Say you need to have motor A turn clo`ckwise at 33% of its full speed.  The subroutine call would be the following...
 motorA(1, 33);
 */
 
 #include <Servo.h>    //servo library
-//#include "pitches.h"  // used for the speaker output
+//#include "pitches.h"  // used for the speaker output, add pitches.h to a pitches folder under /documents/arduino/libraies.
 #define SPEAKER 10    // define a Speaker Pin
 
 Servo headservo;      // initialize a servo object
