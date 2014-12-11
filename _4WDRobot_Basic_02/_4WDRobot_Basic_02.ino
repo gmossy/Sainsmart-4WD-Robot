@@ -56,6 +56,8 @@ const int EchoPin = 11; // HC-SR04 Ultrasonic signal input
 const int TrigPin = 12; // HC-SR04 Ultrasonic signal output
 const int HeadServopin = 9; // pin for signal input of headservo
 
+const int button1Pin = 8;  // pushbutton 1 pin
+
 int add= 0;       //used for nodanger loop count
 int add1= 0;      //used for nodanger loop count
 int roam = 0;     //just listen for serial commands and wait
@@ -81,6 +83,10 @@ Serial.println("t:toggleRoam");
   pinMode(IN4, OUTPUT);       // Motor Driver
   
   motorSpeed = 55;            // Set motorSpeed variable with an initial motor speed % (percentage)  low end is about 20
+
+  // Set up the pushbutton pins to be an input:
+  pinMode(button1Pin, INPUT);
+  int button1State=LOW;
   
  // intialize_beeps();        // call the intialize_beeps method and play some tones 
 
@@ -101,6 +107,7 @@ delay(1000);
 }
 void loop() 
   {
+    int button1State =LOW;  // variables to hold the pushbutton states
     if (Serial.available() > 0)
     {
     int val = Serial.read();	//read serial input commands
@@ -175,6 +182,20 @@ void loop()
   else if(roam == 1){  //If roam active- drive autonomously
       goRoam();          // Go Roaming.  
       }
+     
+  // Here we'll read the current pushbutton state
+
+    button1State = digitalRead(button1Pin);
+  // Now add functions to test if the button is pressed and do something
+  if (button1State == LOW)    // if we're not pushing button 1  
+  {
+  //just listen for serial commands and wait
+  }
+  else
+  {
+     Serial.println("You pressed my pushbutton");
+  } 
+  button1State = LOW;   //reset the pushbutton state
  }
   
 //******************   moveForward *******************
@@ -327,7 +348,31 @@ void motorA(int mode, int percent)
   }
 }
 //**********************************************************
-
+/*
+void buzz(){
+ // method to create a buzz sound
+tone(SPEAKER, NOTE_C7, 100);
+delay(50);
+tone(SPEAKER, NOTE_C6, 100);
+delay(50);
+}
+void intialize_beeps()
+{
+   //initializing the robot beeps sound
+  tone(SPEAKER, NOTE_C7, 100);
+  delay(500);
+  tone(SPEAKER, NOTE_C6, 100);
+  tone(SPEAKER, NOTE_C7, 100);
+  delay(500);
+  tone(SPEAKER, NOTE_C6, 100);
+  tone(SPEAKER, NOTE_C7, 100);
+  delay(500);
+  tone(SPEAKER, NOTE_C6, 100);
+  delay(500);
+  //End Initialize Beeps
+  
+}
+*/
 void toggleRoam(){
   // This method chooses to make the robot roam or else use the serial command input.
 if(roam == 0){
@@ -346,7 +391,6 @@ void goRoam(){
     moveForward(motorSpeed);    // temporary just go forward for a little while
     delay(3000);
     brake();
-     
 //time = millis(); // Sets "time" to current system time count
 currDist = MeasuringDistance(); //measure front distance
 Serial.print("Current Forward Distance: ");
@@ -383,31 +427,7 @@ digitalWrite(TrigPin, LOW);
 duration = pulseIn(EchoPin, HIGH);
 return duration / 29 / 2 + adjust;        // Actual calculation in centimeters
 }
-/*
-void buzz(){
- // method to create a buzz sound
-tone(SPEAKER, NOTE_C7, 100);
-delay(50);
-tone(SPEAKER, NOTE_C6, 100);
-delay(50);
-}
-void intialize_beeps()
-{
-   //initializing the robot beeps sound
-  tone(SPEAKER, NOTE_C7, 100);
-  delay(500);
-  tone(SPEAKER, NOTE_C6, 100);
-  tone(SPEAKER, NOTE_C7, 100);
-  delay(500);
-  tone(SPEAKER, NOTE_C6, 100);
-  tone(SPEAKER, NOTE_C7, 100);
-  delay(500);
-  tone(SPEAKER, NOTE_C6, 100);
-  delay(500);
-  //End Initialize Beeps
-  
-}
-*/
+
 //******************    nodanger   *******************
 void nodanger() {
    running = true;//  Yes I'm still running
@@ -452,4 +472,13 @@ Serial.println("Decided Left Is Best");
    }
 return;
 } 
+
+void doDemo(){
+    // define something for the robot to do when you press the pushbutton
+    
+    Serial.println("Im doing a demo");
+    delay(1000);
+    return;
+}
+ 
 //**********************************************************
