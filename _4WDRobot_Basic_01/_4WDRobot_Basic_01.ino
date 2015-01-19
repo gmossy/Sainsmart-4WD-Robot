@@ -80,7 +80,7 @@ Serial.println("t:toggleRoam");
   pinMode(IN3, OUTPUT);       // Motor Driver
   pinMode(IN4, OUTPUT);       // Motor Driver
   
-  motorSpeed = 55;            // Set motorSpeed variable with an initial motor speed % (percentage)  low end is about 20
+  motorSpeed = 100;            // Set motorSpeed variable with an initial motor speed % (percentage)  low end is about 20
   
  // intialize_beeps();        // call the intialize_beeps method and play some tones 
 
